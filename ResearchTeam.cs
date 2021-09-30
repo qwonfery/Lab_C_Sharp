@@ -2,55 +2,39 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lab1
+namespace C_Sharp_Lab
 {
-    class ResearchTeam
+    class ResearchTeam : Team
     {
-        string topic;
-        string name;
-        int number;
+        private string topic;
         TimeFrame duration;
-        Paper[] papers;
+        System.Collections.ArrayList participants;
+        System.Collections.ArrayList papers;
 
-        public ResearchTeam() : this("topicDefault","nameDefault",0,TimeFrame.Year,new Paper[0])
+        public ResearchTeam() : this("topicDefault","nameDefault",TimeFrame.Year,0)
         {
 
         }
 
 
-        public ResearchTeam(string topicValue,string nameValue,int numberValue,TimeFrame durationValue,Paper[] papersValue)
+        public ResearchTeam(string topicValue,string nameValue,TimeFrame durationValue,int numberValue)
         {
             topic = topicValue;
+            duration = durationValue;
             name = nameValue;
             number = numberValue;
-            duration = durationValue;
-            papers = papersValue;
         }
         public string Topic
         {
             get { return topic; }
             set { topic = value; }
         }
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-        public int Number
-        {
-            get { return number; }
-            set { number = value; }
-        }
         public TimeFrame Duration
         {
             get { return duration; }
             set { duration = value; }
         }
-        public Paper[] Papers
-        {
-            get { return papers; }
-            set { papers = value ; }
-        }
+        
         public Paper lastPaper
         {
             get {
