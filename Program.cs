@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Lab1
+namespace C_Sharp_Lab
 {
     class Program
     {
@@ -17,7 +17,7 @@ namespace Lab1
             Paper[] konsts2 = { Konstitution4, Konstitution5 };
             ResearchTeam Team = new ResearchTeam();
             Console.WriteLine(Team.ToShortString());
-            Console.WriteLine(Team[TimeFrame.Year].ToString() + " " + Team[TimeFrame.TwoYears].ToString() + " " +  Team[TimeFrame.Long].ToString() + '\n');
+            Console.WriteLine(Team[TimeFrame.Year].ToString() + " " + Team[TimeFrame.TwoYears].ToString() + " " + Team[TimeFrame.Long].ToString() + '\n');
             Team.Name = "TestName";
             Team.Number = 123;
             Team.Topic = "TestTopic";
@@ -34,13 +34,13 @@ namespace Lab1
             //    двумерного прямоугольного и двумерного ступенчатого массивов
             //    с одинаковым числом элементов типа Paper.
             Console.WriteLine("Введите количество строк и колонок (разделители ' ','\t' )");
-            string[] input = Console.ReadLine().Split(' ','\t');
-            int nrow =  Convert.ToInt32(input[0]);
+            string[] input = Console.ReadLine().Split(' ', '\t');
+            int nrow = Convert.ToInt32(input[0]);
             int ncolumn = Convert.ToInt32(input[1]);
-            Console.WriteLine("Количество строк = {0} Количество столбцов = {1}",input);
+            Console.WriteLine("Количество строк = {0} Количество столбцов = {1}", input);
 
             ResearchTeam[] ArrayOneDimension = new ResearchTeam[nrow * ncolumn];
-            for (int i = 0 ; i < nrow*ncolumn ; i++)
+            for (int i = 0; i < nrow * ncolumn; i++)
             {
                 ArrayOneDimension[i] = new ResearchTeam();
             }
@@ -53,7 +53,7 @@ namespace Lab1
             }
 
             ResearchTeam[][] ArrayStepped = new ResearchTeam[nrow][];
-            for (int i = 0 ; i < nrow ; i++)
+            for (int i = 0; i < nrow; i++)
             {
                 ArrayStepped[i] = new ResearchTeam[ncolumn];
                 for (int j = 0; j < ncolumn; j++)
@@ -62,17 +62,17 @@ namespace Lab1
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            for (int i = 0 ; i < nrow * ncolumn ; i++)
+            for (int i = 0; i < nrow * ncolumn; i++)
             {
                 ArrayOneDimension[i].Topic = "TOPIC";
             }
             sw.Stop();
-            Console.WriteLine(" Time for OneDimensionalArray = {0}",sw.Elapsed);
+            Console.WriteLine(" Time for OneDimensionalArray = {0}", sw.Elapsed);
             sw.Restart();
             for (int i = 0; i < nrow; i++)
             {
-                for (int j = 0 ; j < ncolumn ; j++)
-                ArraySquare[i,j].Topic = "TOPIC";
+                for (int j = 0; j < ncolumn; j++)
+                    ArraySquare[i, j].Topic = "TOPIC";
             }
             sw.Stop();
             Console.WriteLine(" Time for SquareArray = {0}", sw.Elapsed);
