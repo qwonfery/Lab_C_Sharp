@@ -4,25 +4,27 @@ using System.Text;
 
 namespace C_Sharp_Lab
 {
-    class ResearchTeam : Team
+    class ResearchTeam : Team, System.Collections.IEnumerable
     {
         private string topic;
         TimeFrame duration;
-        System.Collections.ArrayList participants;
+        System.Collections.ArrayList members;
         System.Collections.ArrayList papers;
 
-        public ResearchTeam() : this("topicDefault","nameDefault",TimeFrame.Year,0)
+        public ResearchTeam() : this("topicDefault", "nameDefault", TimeFrame.Year, 0)
         {
 
         }
 
-
-        public ResearchTeam(string topicValue,string nameValue,TimeFrame durationValue,int numberValue)
+        public ResearchTeam(string topicValue, string nameValue, TimeFrame durationValue, int numberValue)
         {
             topic = topicValue;
             duration = durationValue;
             name = nameValue;
             number = numberValue;
+            members = new System.Collections.ArrayList();
+            papers = new System.Collections.ArrayList();
+
         }
         public string Topic
         {
@@ -34,58 +36,102 @@ namespace C_Sharp_Lab
             get { return duration; }
             set { duration = value; }
         }
-        
+
+        public System.Collections.ArrayList Papers
+        {
+            get { return papers; }
+            set { papers = value; }
+        }
+        public System.Collections.ArrayList Members
+        {
+            get { return members; }
+            set { members = value; }
+        }
+
         public Paper lastPaper
         {
-            get {
-                if (this.papers.GetLength(0) == 0)
+            get
+            {
+                if (this.papers.Count == 0)
                 {
                     return null;
                 }
                 else
                 {
-                    Paper PaperSought = Papers[0];
-                    for (int i = 0 ; i < Papers.Length ; i++)
+                    Paper PaperNeeded = (Paper)papers[0];
+                    for (int i = 0; i < Papers.Count; i++)
                     {
-                        PaperSought = Papers[i].PublicationDate.CompareTo(PaperSought.PublicationDate) >= 0 ? Papers[i] : PaperSought; 
+                        Paper PaperTemp = (Paper)papers[i];
+                        if (PaperTemp.PublicationDate.CompareTo(PaperNeeded.PublicationDate) >= 0)
+                        {
+                            PaperNeeded = PaperTemp;
+                        }
                     }
-                    return PaperSought;
+                    return PaperNeeded;
                 }
             }
 
         }
-        public bool this[TimeFrame index]
+        public Team BaseTeam
         {
             get
             {
-                return Duration.CompareTo(index) == 0; 
+                return new Team(name, number);
+            }
+            set
+            {
+                name = value.Name;
+                number = value.Number;
             }
         }
         public void AddPapers(params Paper[] PapersValue)
         {
-            Paper[] PapersNew = new Paper[Papers.Length + PapersValue.Length];
-            Papers.CopyTo(PapersNew,0);
-            Array.ConstrainedCopy(PapersValue,0,PapersNew,Papers.Length, PapersValue.Length);
-            Papers = PapersNew;
+            for (int i = 0; i < PapersValue.Length; i++)
+            {
+                papers.Add(PapersValue[i]);
+            }
+        }
+        public void AddMembers(params Person[] MembersValue)
+        {
+            for (int i = 0; i < MembersValue.Length; i++)
+            {
+                members.Add(MembersValue[i]);
+            }
         }
 
+        public bool this[TimeFrame index]
+        {
+            get
+            {
+                return Duration.CompareTo(index) == 0;
+            }
+        }
 
         public override string ToString()
         {
             string PapersString = new string("Papers: \n");
-            PapersString += Papers[0].ToString();
-            if (Papers.Length > 0)
+            if (papers.Count > 0)
             {
-                for (int i = 1; i < Papers.Length; i++)
+                PapersString += papers[0].ToString();
+                for (int i = 1; i < papers.Count; i++)
                 {
-                    PapersString += Papers[i].ToString();
+                    PapersString += papers[i].ToString();
+                }
+            }
+            string MembersString = new string("Members: \n");
+            if (members.Count > 0)
+            {
+                MembersString += (members[0].ToString() + '\n');
+                for (int i = 1; i < members.Count; i++)
+                {
+                    MembersString += (members[i].ToString() + '\n');
                 }
             }
             return "Topic: " + Topic + "\n"
                 + "Name: " + Name + '\n'
                 + "Number: " + Number + '\n'
                 + "Duration: " + Duration + '\n'
-                + PapersString;
+                + PapersString + MembersString;
         }
         public string ToShortString()
         {
@@ -95,6 +141,89 @@ namespace C_Sharp_Lab
                 + "Duration: " + Duration + '\n';
         }
 
+        public override object DeepCopy()
+        {
+            ResearchTeam TeamCopy = new ResearchTeam(topic, name, duration, number)
+            {
+                members = members,
+                papers = papers
+            };
+            return TeamCopy;
+        }
 
+        public System.Collections.IEnumerable NoPublication()
+        {
+            for (int i = 0; i < members.Count; i++)
+            {
+                bool noPublication = true;
+                Person PersonTemp = (Person)members[i];
+
+                for (int j = 0; j < papers.Count; j++)
+                {
+                    Paper PaperTemp = (Paper)papers[j];
+
+                    if (PaperTemp.Author == PersonTemp)
+                    {
+                        noPublication = false;
+                    }
+
+                }
+
+                if (noPublication == true)
+                {
+                    yield return PersonTemp;
+                }
+
+            }
+
+        }
+        public System.Collections.IEnumerable LastPublications(int n)
+        {
+            for (int i = 0; i < papers.Count; i++)
+            {
+                Paper PaperTemp = (Paper)papers[i];
+
+                if (PaperTemp.PublicationDate > DateTime.Today.AddYears(-n))
+                {
+                    yield return PaperTemp;
+                }
+
+            }
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+        public System.Collections.IEnumerator GetEnumerator()
+        {
+            return new ResearchTeamEnumerator(members, papers);
+        }
+
+        public System.Collections.IEnumerable MoreThanOnePublication()
+        {
+            foreach (Person member in this)
+            {
+                int counter = 0;
+                foreach (Paper p in papers)
+                {
+                    if (p.Author == member)
+                    {
+                        counter++;
+                    }
+                }
+                if (counter > 1)
+                {
+                    yield return member;
+                }
+            }
+        }
+
+        public System.Collections.IEnumerable LastYearPublications()
+        {
+            foreach (Paper p in LastPublications(1))
+            {
+                yield return p;
+            }
+        }
     }
 }

@@ -48,12 +48,12 @@ namespace C_Sharp_Lab
         }
 
         public override string ToString() {
-            return "Person: " + Name + " "  +  Surname + " " + Date;
+            return "Person: " + Name + " "  +  Surname + " " + Date ;
         }
 
         public string ToShortString()
         {
-            return "Person: " + Name + " " + Surname;
+            return "Person: " + Name + " " + Surname ;
         }
 
         public override bool Equals(object obj) => this.Equals(obj as Person);

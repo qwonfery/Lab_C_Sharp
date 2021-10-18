@@ -6,9 +6,6 @@ namespace C_Sharp_Lab
 {
     class Paper
     {
-        //string title;
-        //Person author;
-        //DateTime publicationDate;
         public string Title { get; set; }
         public Person Author { get; set; }
         public DateTime PublicationDate { get; set; }
