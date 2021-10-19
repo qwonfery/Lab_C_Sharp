@@ -4,13 +4,13 @@ using System.Text;
 
 namespace C_Sharp_Lab
 {
-    public class ResearchTeamEnumerator : System.Collections.IEnumerator
+    class ResearchTeamEnumerator : System.Collections.IEnumerator
     {
-        System.Collections.ArrayList members;
-        System.Collections.ArrayList papers;
+        List<Person> members;
+        List<Paper> papers;
         int position = -1;
 
-        public ResearchTeamEnumerator(System.Collections.ArrayList _members, System.Collections.ArrayList _papers)
+        public ResearchTeamEnumerator(List<Person> _members, List<Paper> _papers)
         {
             members = _members;
             papers = _papers;

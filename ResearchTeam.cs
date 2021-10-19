@@ -8,8 +8,8 @@ namespace C_Sharp_Lab
     {
         private string topic;
         TimeFrame duration;
-        System.Collections.ArrayList members;
-        System.Collections.ArrayList papers;
+        List<Person> members;
+        List<Paper> papers;
 
         public ResearchTeam() : this("topicDefault", "nameDefault", TimeFrame.Year, 0)
         {
@@ -22,8 +22,8 @@ namespace C_Sharp_Lab
             duration = durationValue;
             name = nameValue;
             number = numberValue;
-            members = new System.Collections.ArrayList();
-            papers = new System.Collections.ArrayList();
+            members = new List<Person>();
+            papers = new List<Paper>();
 
         }
         public string Topic
@@ -37,12 +37,12 @@ namespace C_Sharp_Lab
             set { duration = value; }
         }
 
-        public System.Collections.ArrayList Papers
+        public List<Paper> Papers
         {
             get { return papers; }
             set { papers = value; }
         }
-        public System.Collections.ArrayList Members
+        public List<Person> Members
         {
             get { return members; }
             set { members = value; }
