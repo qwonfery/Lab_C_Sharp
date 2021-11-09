@@ -143,11 +143,21 @@ namespace C_Sharp_Lab
 
         public override object DeepCopy()
         {
-            ResearchTeam TeamCopy = new ResearchTeam(topic, name, duration, number)
+            ResearchTeam TeamCopy = new ResearchTeam();
+            TeamCopy.topic = topic;
+            TeamCopy.duration = duration;
+            TeamCopy.name = name;
+            TeamCopy.number = number;
+            TeamCopy.members = new List<Person>();
+            TeamCopy.papers = new List<Paper>(); ;
+            foreach (Person p in members)
             {
-                members = members,
-                papers = papers
-            };
+                TeamCopy.members.Add((Person)p.DeepCopy());
+            }
+            foreach (Paper p in papers)
+            {
+                TeamCopy.papers.Add((Paper)p.DeepCopy());
+            }
             return TeamCopy;
         }
 
@@ -225,5 +235,19 @@ namespace C_Sharp_Lab
                 yield return p;
             }
         }
+
+        public void SortByDate()
+        {
+            papers.Sort();
+        }
+        public void SortByTitle()
+        {
+            papers.Sort(new PaperComp());
+        }
+        public void SortByAuthor()
+        {
+            papers.Sort(new PaperCompAuthor());
+        }
+
     }
 }

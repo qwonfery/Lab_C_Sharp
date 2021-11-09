@@ -96,6 +96,11 @@ namespace C_Sharp_Lab
 
         public static bool operator !=(Person lhs, Person rhs) => !(lhs == rhs);
 
+        public object DeepCopy()
+        {
+            return new Person(name, surname, date);
+        }
+
 
     }
 }

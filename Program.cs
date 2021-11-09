@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace C_Sharp_Lab
 {
@@ -8,63 +9,69 @@ namespace C_Sharp_Lab
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Номер 1 : ");
-            Team T1 = new Team("team", 17);
-            Team T2 = new Team("team", 17);
-            Console.WriteLine("Равенство ссылок : {0}", ReferenceEquals(T1, T2));
-            Console.WriteLine("Равенство по значению : {0}\n",Equals(T1, T2));
-            Console.WriteLine("Номер 2 : ");
-            try
-            {
-                T1.Number = -5;
-            }
-            catch(ArgumentOutOfRangeException ex)
-            {
-                Console.WriteLine("{0}\n", ex);
-            }
-            Console.WriteLine("Номер 3 : ");
+
+            Console.WriteLine("Exercise 1 : \n");
             Person Person1 = new Person("Vladimir", "Putin", new DateTime(1932, 10, 6));
             Person Person2 = new Person("Viktor", "Tsoy", new DateTime(1979, 9, 5));
             Person Person3 = new Person("Michail", "Gorshenev", new DateTime(1999, 9, 9));
-            Paper Paper1 = new Paper("publ1",Person1,new DateTime(2000,3,3));
-            Paper Paper2 = new Paper("publ2", Person1, new DateTime(2010, 6, 6));
-            Paper Paper3 = new Paper("publ3", new Person(), new DateTime(2021, 5, 5));
-            ResearchTeam RTeam = new ResearchTeam("topic1","teamName1",TimeFrame.TwoYears,12);
-            RTeam.AddPapers(new Paper[] {Paper1,Paper2,Paper3});
-            RTeam.AddMembers(new Person[] { Person1, Person2, Person3,new Person()});
+            Paper Paper1 = new Paper("publ1", Person1, new DateTime(2200, 3, 3));
+            Paper Paper2 = new Paper("publ3", Person1, new DateTime(2010, 6, 6));
+            Paper Paper3 = new Paper("publ2", new Person(), new DateTime(2021, 5, 5));
+            ResearchTeam RTeam = new ResearchTeam("topic1", "teamName1", TimeFrame.TwoYears, 12);
+            RTeam.AddPapers(new Paper[] { Paper1, Paper2, Paper3 });
+            RTeam.AddMembers(new Person[] { Person1, Person2, Person3, new Person() });
             Console.WriteLine(RTeam);
-            Console.WriteLine("Номер 4 : ");
-            Console.WriteLine(RTeam.BaseTeam);
-            Console.WriteLine("\nНомер 5 : ");
-            ResearchTeam RTeamCopy = (ResearchTeam)RTeam.DeepCopy();
-            Console.WriteLine(RTeamCopy);
-            Console.WriteLine("Номер 6 : ");
-            foreach ( Person p in RTeam.NoPublication())
+            RTeam.SortByDate();
+            Console.WriteLine(RTeam);
+            RTeam.SortByTitle();
+            Console.WriteLine(RTeam);
+            RTeam.SortByAuthor();
+            Console.WriteLine(RTeam);
+
+            Console.WriteLine("Exercise 2 : \n");
+            KeySelector<string> keySelector = (ResearchTeam rt) => rt.GetHashCode().ToString();
+            ResearchTeamCollection<string> collection = new ResearchTeamCollection<string>(keySelector);
+
+            ResearchTeam RTeam2 = new ResearchTeam("topic2", "teamName2", TimeFrame.TwoYears, 12);
+            RTeam2.AddPapers(new Paper[] { Paper1, new Paper() });
+            RTeam2.AddMembers(new Person[] { Person1, new Person() });
+            collection.AddDefaults();
+            collection.AddResearchTeams(RTeam, RTeam2);
+            Console.WriteLine(collection.ToString());
+
+            Console.WriteLine("Exercise 3 : \n");
+            Console.WriteLine($"Last Paper Date: {collection.LastDate}");
+            Console.WriteLine($"Groups by duration: \n");
+            foreach (var group in collection.GroupByDuration)
             {
-                Console.WriteLine(p);
+                Console.WriteLine(group.Key.ToString() + ":\n");
+                foreach (var item in group)
+                {
+                    Console.WriteLine(item.Value);
+                }
             }
-            Console.WriteLine("\nНомер 7 : ");
-            foreach (Paper p in RTeam.LastPublications(2))
+            Console.WriteLine($"TwoYears Duration Group: \n");
+            foreach (var item in collection.TimeFrameGroup(TimeFrame.TwoYears))
             {
-                Console.WriteLine(p);
+                Console.WriteLine(item.Value.ToString() + "\n");
             }
 
-            Console.WriteLine("\nДопы : ");
-            Console.WriteLine("Номер 8 : ");
-            foreach (Person p in RTeam)
+            GenerateElement<Team, ResearchTeam> generateElement = (int j) =>
             {
-                Console.WriteLine(p);
-            }
-            Console.WriteLine("Номер 9 : ");
-            foreach (Person p in RTeam.MoreThanOnePublication())
-            {
-                Console.WriteLine(p);
-            }
-            Console.WriteLine("Номер 10 : ");
-            foreach (Paper p in RTeam.LastYearPublications())
-            {
-                Console.WriteLine(p);
-            }
+                Team key = new Team($"Test{j}",j);
+                ResearchTeam value = new ResearchTeam($"topic{j}",key.Name,TimeFrame.Year, key.Number);
+                return new KeyValuePair<Team, ResearchTeam>(key,value);
+            };
+            TestCollections<Team,ResearchTeam> Test = new TestCollections<Team, ResearchTeam>(1000000,generateElement);
+            Console.WriteLine("Search time for element in key list: \n");
+            Test.SearchTimeKeyList();
+            Console.WriteLine("Search time for element in string list: \n");
+            Test.SearchTimeKeyList();
+            Console.WriteLine("Search time for element by key in dictionary: \n");
+            Test.SearchTimeKeyList();
+            Console.WriteLine("Search time for element value in dictionary: \n");
+            Test.SearchTimeKeyList();
+
         }
     }
 }
