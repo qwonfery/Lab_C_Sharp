@@ -4,7 +4,7 @@ using System.Text;
 
 namespace C_Sharp_Lab
 {
-    class ResearchTeam : Team, System.Collections.IEnumerable
+    class ResearchTeam : Team, System.Collections.IEnumerable, System.ComponentModel.INotifyPropertyChanged
     {
         private string topic;
         TimeFrame duration;
@@ -29,12 +29,20 @@ namespace C_Sharp_Lab
         public string Topic
         {
             get { return topic; }
-            set { topic = value; }
+            set
+            {
+                topic = value;
+                NotifyPropertyChanged();
+            }
         }
         public TimeFrame Duration
         {
             get { return duration; }
-            set { duration = value; }
+            set
+            {
+                duration = value;
+                NotifyPropertyChanged();
+            }
         }
 
         public List<Paper> Papers
@@ -249,5 +257,14 @@ namespace C_Sharp_Lab
             papers.Sort(new PaperCompAuthor());
         }
 
+        //LAB 4
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
     }
+
+
 }

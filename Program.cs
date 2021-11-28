@@ -9,69 +9,43 @@ namespace C_Sharp_Lab
     {
         static void Main(string[] args)
         {
-
-            Console.WriteLine("Exercise 1 : \n");
-            Person Person1 = new Person("Vladimir", "Putin", new DateTime(1932, 10, 6));
-            Person Person2 = new Person("Viktor", "Tsoy", new DateTime(1979, 9, 5));
-            Person Person3 = new Person("Michail", "Gorshenev", new DateTime(1999, 9, 9));
-            Paper Paper1 = new Paper("publ1", Person1, new DateTime(2200, 3, 3));
-            Paper Paper2 = new Paper("publ3", Person1, new DateTime(2010, 6, 6));
-            Paper Paper3 = new Paper("publ2", new Person(), new DateTime(2021, 5, 5));
-            ResearchTeam RTeam = new ResearchTeam("topic1", "teamName1", TimeFrame.TwoYears, 12);
-            RTeam.AddPapers(new Paper[] { Paper1, Paper2, Paper3 });
-            RTeam.AddMembers(new Person[] { Person1, Person2, Person3, new Person() });
-            Console.WriteLine(RTeam);
-            RTeam.SortByDate();
-            Console.WriteLine(RTeam);
-            RTeam.SortByTitle();
-            Console.WriteLine(RTeam);
-            RTeam.SortByAuthor();
-            Console.WriteLine(RTeam);
-
-            Console.WriteLine("Exercise 2 : \n");
+            ResearchTeam RTeam1 = new ResearchTeam($"topic{1}", $"teamName{1}", TimeFrame.TwoYears, 1);
+            ResearchTeam RTeam2 = new ResearchTeam($"topic{2}", $"teamName{2}", TimeFrame.TwoYears, 2);
             KeySelector<string> keySelector = (ResearchTeam rt) => rt.GetHashCode().ToString();
-            ResearchTeamCollection<string> collection = new ResearchTeamCollection<string>(keySelector);
+            ResearchTeamCollection<string> collection1 = new ResearchTeamCollection<string>(keySelector);
+            collection1.AddDefaults();
+            collection1.AddResearchTeams(RTeam1, RTeam2);
+            collection1.Name = "Collection1";
 
-            ResearchTeam RTeam2 = new ResearchTeam("topic2", "teamName2", TimeFrame.TwoYears, 12);
-            RTeam2.AddPapers(new Paper[] { Paper1, new Paper() });
-            RTeam2.AddMembers(new Person[] { Person1, new Person() });
-            collection.AddDefaults();
-            collection.AddResearchTeams(RTeam, RTeam2);
-            Console.WriteLine(collection.ToString());
+            ResearchTeam RTeam4 = new ResearchTeam($"topic{4}", $"teamName{4}", TimeFrame.TwoYears, 3);
+            ResearchTeam RTeam5 = new ResearchTeam($"topic{5}", $"teamName{5}", TimeFrame.TwoYears, 4);
+            ResearchTeamCollection<string> collection2 = new ResearchTeamCollection<string>(keySelector);
+            collection2.AddDefaults();
+            collection2.AddResearchTeams(RTeam4, RTeam5);
+            collection2.Name = "collection2";
 
-            Console.WriteLine("Exercise 3 : \n");
-            Console.WriteLine($"Last Paper Date: {collection.LastDate}");
-            Console.WriteLine($"Groups by duration: \n");
-            foreach (var group in collection.GroupByDuration)
-            {
-                Console.WriteLine(group.Key.ToString() + ":\n");
-                foreach (var item in group)
-                {
-                    Console.WriteLine(item.Value);
-                }
-            }
-            Console.WriteLine($"TwoYears Duration Group: \n");
-            foreach (var item in collection.TimeFrameGroup(TimeFrame.TwoYears))
-            {
-                Console.WriteLine(item.Value.ToString() + "\n");
-            }
-
-            GenerateElement<Team, ResearchTeam> generateElement = (int j) =>
-            {
-                Team key = new Team($"Test{j}",j);
-                ResearchTeam value = new ResearchTeam($"topic{j}",key.Name,TimeFrame.Year, key.Number);
-                return new KeyValuePair<Team, ResearchTeam>(key,value);
-            };
-            TestCollections<Team,ResearchTeam> Test = new TestCollections<Team, ResearchTeam>(1000000,generateElement);
-            Console.WriteLine("Search time for element in key list: \n");
-            Test.SearchTimeKeyList();
-            Console.WriteLine("Search time for element in string list: \n");
-            Test.SearchTimeKeyList();
-            Console.WriteLine("Search time for element by key in dictionary: \n");
-            Test.SearchTimeKeyList();
-            Console.WriteLine("Search time for element value in dictionary: \n");
-            Test.SearchTimeKeyList();
-
+            TeamsJournal ChangeJournal = new TeamsJournal();
+            collection1.ResearchTeamsChanged += ChangeJournal.AddChange;
+            collection2.ResearchTeamsChanged += ChangeJournal.AddChange;
+            //вносим изменения
+            //добавляем элементы
+            collection1.AddResearchTeams(new ResearchTeam($"topic{3}", $"teamName{3}", TimeFrame.TwoYears, 5));
+            collection2.AddResearchTeams(new ResearchTeam($"topic{6}", $"teamName{6}", TimeFrame.TwoYears, 6));
+            //изименем значения
+            RTeam1.Topic = "ChangedTopic";
+            RTeam2.Duration = TimeFrame.Year;
+            //удаляем элемент
+            collection1.Remove(RTeam1);
+            //измегнение в удаленном
+            RTeam1.Duration = TimeFrame.Year;
+            //замена
+            collection2.Replace(RTeam5, RTeam1);
+            //изменение в замененном
+            RTeam5.Topic = "ChangedTopic";
+            //выводим журнал
+            Console.WriteLine(ChangeJournal);
         }
+
+
     }
 }

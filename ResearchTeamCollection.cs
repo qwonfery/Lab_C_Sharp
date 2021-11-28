@@ -5,12 +5,15 @@ using System.Linq;
 
 namespace C_Sharp_Lab
 {
+    delegate void ResearchTeamsChangedHandler<TKey>(object source, ResearchTeamsChangedEventArgs<TKey> args);
+
     delegate TKey KeySelector<TKey>(ResearchTeam rt);
     class ResearchTeamCollection<TKey>
     {
 
         private Dictionary<TKey, ResearchTeam> collection = new Dictionary<TKey, ResearchTeam>();
         private KeySelector<TKey> keySelector;
+        public string Name { get; set; }
 
         public ResearchTeamCollection(KeySelector<TKey> keySelectorValue)
         {
@@ -38,8 +41,8 @@ namespace C_Sharp_Lab
         {
             get
             {
-                IEnumerable<IGrouping<TimeFrame, KeyValuePair<TKey, ResearchTeam>>> result = collection.GroupBy( 
-                   group => group.Value.Duration );
+                IEnumerable<IGrouping<TimeFrame, KeyValuePair<TKey, ResearchTeam>>> result = collection.GroupBy(
+                   group => group.Value.Duration);
                 return result;
             }
         }
@@ -48,6 +51,7 @@ namespace C_Sharp_Lab
         {
             ResearchTeam defaultRT = new ResearchTeam();
             collection.Add(keySelector(defaultRT), defaultRT);
+            defaultRT.PropertyChanged += HandlerPropertyChanged;
         }
 
         public void AddResearchTeams(params ResearchTeam[] paramsValue)
@@ -55,6 +59,7 @@ namespace C_Sharp_Lab
             foreach (ResearchTeam param in paramsValue)
             {
                 collection.Add(keySelector(param), param);
+                param.PropertyChanged += HandlerPropertyChanged; 
             }
         }
 
@@ -85,10 +90,56 @@ namespace C_Sharp_Lab
         }
 
 
+        //LAB 4
 
+        public event ResearchTeamsChangedHandler<TKey> ResearchTeamsChanged;
+        private void HandlerPropertyChanged(object o, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ResearchTeam rt = (ResearchTeam)o;
+            ResearchTeamsChanged?.Invoke(this, new ResearchTeamsChangedEventArgs<TKey>(Name, Revision.Property, e.PropertyName, rt.Number));
+        }
+        private void NotifyResearchTeamsChanged(Revision revisionValue, string propertyValue, int numberValue)
+        {
+            ResearchTeamsChanged?.Invoke(this,new ResearchTeamsChangedEventArgs<TKey>(Name,revisionValue,propertyValue,numberValue));
+        }
+        public bool Remove(ResearchTeam rt)
+        {
+            if (collection.ContainsValue(rt))
+            {
+                foreach (KeyValuePair<TKey, ResearchTeam> kvp in collection)
+                {
+                    if (kvp.Value == rt)
+                    {
+                        collection.Remove(kvp.Key);
+                        kvp.Value.PropertyChanged -= HandlerPropertyChanged;
+                        NotifyResearchTeamsChanged(Revision.Remove, "", rt.Number);
 
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public bool Replace(ResearchTeam rtold, ResearchTeam rtnew)
+        {
+            if (collection.ContainsValue(rtold))
+            {
+                foreach (KeyValuePair<TKey, ResearchTeam> kvp in collection)
+                {
+                    if (kvp.Value == rtold)
+                    {
+                        collection[kvp.Key] = (ResearchTeam)rtnew.DeepCopy();
+                        rtold.PropertyChanged -= HandlerPropertyChanged;
+                        NotifyResearchTeamsChanged(Revision.Replace, "", rtold.Number);
+                        rtnew.PropertyChanged += HandlerPropertyChanged;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
+     
 
     }
-
 }
